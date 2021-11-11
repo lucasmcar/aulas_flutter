@@ -3,18 +3,17 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
-
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  String cep = "91920130";
-  String url = "https://viacep.com.br/ws/91920130/json/";
+  final TextEditingController _cep = TextEditingController();
+  String _resultado = "Resultado";
 
   _recuperarCep() async {
-    String url = "https://viacep.com.br/ws/91920130/json/";
+    String cepDigitado = _cep.text;
+    String url = "https://viacep.com.br/ws/${cepDigitado}/json/";
     http.Response response;
 
     response = await http.get(url);
@@ -23,7 +22,9 @@ class _HomeState extends State<Home> {
     String complemento = retorno['complemento'];
     String bairro = retorno['bairro'];
 
-    print("recuperando dados: ${logradouro}, ${complemento}, ${bairro}");
+    setState(() {
+      _resultado = "${logradouro}, ${complemento}, ${bairro}";
+    });
   }
 
   @override
@@ -34,8 +35,15 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: <Widget>[
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "00000000"),
+                style: const TextStyle(fontSize: 20),
+                controller: _cep,
+              ),
               RaisedButton(
                   child: const Text("Acessar"), onPressed: _recuperarCep),
+              Text(_resultado)
             ],
           )),
     );
